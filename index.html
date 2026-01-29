@@ -3,344 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>年会抽奖系统</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0f0f23 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Microsoft YaHei', sans-serif;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* 动态背景粒子 */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #00f5ff;
-            border-radius: 50%;
-            animation: float 15s infinite;
-            box-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* 标题样式 */
-        .title {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff, 0 0 30px #00f5ff, 0 0 40px #00f5ff;
-            margin-bottom: 60px;
-            letter-spacing: 10px;
-            animation: titleGlow 2s ease-in-out infinite alternate;
-            position: relative;
-            z-index: 1;
-        }
-
-        @keyframes titleGlow {
-            from {
-                text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff, 0 0 30px #00f5ff;
-            }
-            to {
-                text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff;
-            }
-        }
-
-        /* 姓名显示区域 */
-        .name-display {
-            width: 400px;
-            height: 200px;
-            background: linear-gradient(145deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 255, 0.1));
-            border: 3px solid #00f5ff;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 60px;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.5), inset 0 0 30px rgba(0, 245, 255, 0.1);
-            overflow: hidden;
-        }
-
-        .name-display::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(0, 245, 255, 0.1), transparent);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-            100% {
-                transform: translateX(100%) translateY(100%) rotate(45deg);
-            }
-        }
-
-        .name {
-            font-size: 5rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff;
-            transition: all 0.3s ease;
-        }
-
-        .name.winner {
-            animation: winnerPulse 0.5s ease-in-out;
-            color: #ffd700;
-            text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700;
-            font-size: 6rem;
-        }
-
-        @keyframes winnerPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-
-        /* 按钮样式 */
-        .btn {
-            padding: 20px 80px;
-            font-size: 2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .btn-start {
-            background: linear-gradient(145deg, #00f5ff, #0099cc);
-            color: #000;
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
-        }
-
-        .btn-start:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(0, 245, 255, 0.8);
-        }
-
-        .btn-stop {
-            background: linear-gradient(145deg, #ff0055, #cc0044);
-            color: #fff;
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
-        }
-
-        .btn-stop:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(255, 0, 85, 0.8);
-        }
-
-        /* 装饰性边框 */
-        .corner {
-            position: fixed;
-            width: 100px;
-            height: 100px;
-            z-index: 1;
-        }
-
-        .corner-tl {
-            top: 20px;
-            left: 20px;
-            border-top: 3px solid #00f5ff;
-            border-left: 3px solid #00f5ff;
-            box-shadow: -5px -5px 10px rgba(0, 245, 255, 0.3);
-        }
-
-        .corner-tr {
-            top: 20px;
-            right: 20px;
-            border-top: 3px solid #00f5ff;
-            border-right: 3px solid #00f5ff;
-            box-shadow: 5px -5px 10px rgba(0, 245, 255, 0.3);
-        }
-
-        .corner-bl {
-            bottom: 20px;
-            left: 20px;
-            border-bottom: 3px solid #00f5ff;
-            border-left: 3px solid #00f5ff;
-            box-shadow: -5px 5px 10px rgba(0, 245, 255, 0.3);
-        }
-
-        .corner-br {
-            bottom: 20px;
-            right: 20px;
-            border-bottom: 3px solid #00f5ff;
-            border-right: 3px solid #00f5ff;
-            box-shadow: 5px 5px 10px rgba(0, 245, 255, 0.3);
-        }
-
-        /* 中奖历史记录 */
-        .history {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 1rem;
-            z-index: 1;
-        }
-    </style>
+    <title>年会盛典 - 幸运大抽奖</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="particles" id="particles"></div>
+    <div class="bg-overlay"></div>
+    <div class="container">
+        <header>
+            <h1>LUCKY DRAW 2026</h1>
+            <p class="subtitle">年度盛典 · 幸运降临</p>
+        </header>
 
-    <div class="corner corner-tl"></div>
-    <div class="corner corner-tr"></div>
-    <div class="corner corner-bl"></div>
-    <div class="corner corner-br"></div>
+        <main>
+            <div class="screen-container">
+                <div class="screen-border">
+                    <div class="screen-content" id="display-area">Wait for Import...</div>
+                </div>
+            </div>
 
-    <h1 class="title">年会抽奖</h1>
+            <div class="controls">
+                <input type="file" id="file-input" accept=".txt" style="display: none;">
+                <button id="btn-import" class="btn secondary">
+                    <span class="icon">📂</span> 导入员工
+                </button>
+                <button id="btn-toggle" class="btn primary">
+                    <span class="icon">▶</span> 开始抽奖
+                </button>
+            </div>
+        </main>
 
-    <div class="name-display">
-        <span class="name" id="name">准备抽奖</span>
+        <aside class="history-panel">
+            <h3>中奖名单 / WINNERS</h3>
+            <div class="list-container">
+                <ul id="winner-list">
+                    <!-- 中奖名单将在这里生成 -->
+                </ul>
+            </div>
+            <div class="status-bar">
+                已导入: <span id="total-count">0</span> 人 | 已中奖: <span id="winner-count">0</span> 人
+            </div>
+        </aside>
     </div>
 
-    <button class="btn btn-start" id="btn">开始</button>
+    <!-- 弹窗 -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎉 CONGRATULATIONS 🎉</h2>
+            <div id="modal-winner-name" class="winner-highlight">???</div>
+            <button id="btn-close-modal" class="btn primary">确定</button>
+        </div>
+    </div>
 
-    <div class="history" id="history">中奖记录：</div>
-
-    <script>
-        // 员工名单
-        const employees = ['张三', '李四', '王五', '赵六', '卫七', '苏八', '程九', '杨十'];
-
-        // 中奖记录
-        const winners = [];
-
-        // DOM元素
-        const nameDisplay = document.getElementById('name');
-        const btn = document.getElementById('btn');
-        const historyDisplay = document.getElementById('history');
-
-        // 状态
-        let isRunning = false;
-        let interval = null;
-        let currentIndex = 0;
-
-        // 创建背景粒子
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // 切换按钮
-        btn.addEventListener('click', function() {
-            if (!isRunning) {
-                start();
-            } else {
-                stop();
-            }
-        });
-
-        // 开始抽奖
-        function start() {
-            if (employees.length === 0) {
-                alert('所有人都已中奖！');
-                return;
-            }
-
-            isRunning = true;
-            btn.textContent = '结束';
-            btn.classList.remove('btn-start');
-            btn.classList.add('btn-stop');
-            nameDisplay.classList.remove('winner');
-
-            // 快速滚动显示名字
-            interval = setInterval(function() {
-                currentIndex = (currentIndex + 1) % employees.length;
-                nameDisplay.textContent = employees[currentIndex];
-            }, 50);
-        }
-
-        // 停止抽奖
-        function stop() {
-            isRunning = false;
-            clearInterval(interval);
-
-            btn.textContent = '开始';
-            btn.classList.remove('btn-stop');
-            btn.classList.add('btn-start');
-
-            // 显示中奖效果
-            nameDisplay.classList.add('winner');
-
-            const winner = employees[currentIndex];
-
-            // 从名单中移除中奖者
-            employees.splice(currentIndex, 1);
-            currentIndex = 0;
-
-            // 记录中奖者
-            winners.push(winner);
-            historyDisplay.textContent = '中奖记录：' + winners.join('、');
-        }
-
-        // 键盘空格键控制
-        document.addEventListener('keydown', function(e) {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                btn.click();
-            }
-        });
-
-        // 初始化
-        createParticles();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
